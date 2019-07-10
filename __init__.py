@@ -51,7 +51,7 @@ import bpy, bmesh
 bl_info = {
 	"name": "Waspmed",
 	"author": "WASP",
-	"version": (0, 0, 5),
+	"version": (0, 0, 6),
 	"blender": (2, 80, 0),
 	"location": "",
 	"description": "Tools for medical devices",

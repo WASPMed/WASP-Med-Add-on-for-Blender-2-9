@@ -213,23 +213,32 @@ class OBJECT_OT_wm_add_measure_plane(bpy.types.Operator):
     bl_description = ("Generate a section plane object in order to evaluate the local circumference")
     bl_options = {'REGISTER', 'UNDO'}
 
+    #scale = bpy.context.scene.unit_settings.scale_length
+
     thickness : bpy.props.FloatProperty(
-        name="Thickness", default=5, min=0.0001, soft_max=20,
+        name="Thickness", default=1, min=0.0001, soft_max=20,
         description="Wireframe modifier thickness",
         unit = 'LENGTH'
         )
 
+
     @classmethod
     def poll(cls, context):
+        '''
         try:
             ob = get_patient(context.object)
             if get_status(ob) > 0:
                 return not ob.hide_viewport
             else: return False
         except: return False
+        '''
+        return context.object.type == 'MESH'
+
 
     def execute(self, context):
         ob = get_patient(context.object)
+        if get_patientID(ob) == None or ob == False: ob = context.object
+        print(ob.name)
         size = ob.dimensions.length
         bpy.ops.mesh.primitive_plane_add(size=size, location=(0, 0, 0))
         plane = context.object
@@ -274,7 +283,9 @@ class OBJECT_OT_wm_measure_circumference(bpy.types.Operator):
         for m in ob.modifiers:
             show_modifiers.append(m.show_viewport)
             if m.type != 'BOOLEAN': m.show_viewport = False
-        me = ob.to_mesh()
+        depsgraph = bpy.context.evaluated_depsgraph_get()
+        ob_eval = ob.evaluated_get(depsgraph)
+        me = ob_eval.to_mesh()
         for m, show in zip(ob.modifiers, show_modifiers): m.show_viewport = show
         length = 0
         bm = bmesh.new()
