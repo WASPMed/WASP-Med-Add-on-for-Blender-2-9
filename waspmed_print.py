@@ -97,7 +97,7 @@ class WASPMED_PT_print(bpy.types.Panel):
         if context.mode == 'OBJECT' and False:
             col.separator()
             col.operator("object.add_measure_plane", text="Add Measure Plane", icon='MESH_PLANE')
-            col.operator("object.measure_circumference", text="Measure Circumference", icon='DRIVER_DISTANCE')
+            col.operator("object.measure_circumference", text="Measure Circumferences", icon='DRIVER_DISTANCE')
         col.separator()
         col.operator("screen.region_quadview", text="Toggle Quad View", icon='VIEW3D')
         col.separator()

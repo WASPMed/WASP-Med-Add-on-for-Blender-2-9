@@ -287,8 +287,8 @@ class WASPMED_PT_deform(bpy.types.Panel):
         #col.operator("view3d.ruler", text="Ruler", icon="ARROW_LEFTRIGHT")
         if context.mode == 'OBJECT':
             col.separator()
-            col.operator("object.wm_add_measure_plane", text="Add Measure Plane", icon='MESH_PLANE')
-            col.operator("object.wm_measure_circumference", text="Measure Circumference", icon='DRIVER_DISTANCE')
+            col.operator("object.wm_add_measure_plane", text="Add Measure Plane", icon='MESH_CIRCLE')
+            col.operator("object.wm_measure_circumference", text="Measure Circumferences", icon='DRIVER_DISTANCE')
         col.separator()
         col.operator("screen.region_quadview", text="Toggle Quad View", icon='VIEW3D')
         col.separator()

@@ -79,11 +79,63 @@ class OBJECT_OT_wm_set_sculpt(bpy.types.Operator):
         bpy.ops.object.mode_set(mode='SCULPT')
         return {'FINISHED'}
 
+
+class OBJECT_OT_wm_set_draw(bpy.types.Operator):
+    bl_idname = "object.wm_set_draw"
+    bl_label = "Draw"
+    bl_description = ("")
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        try:
+            return context.object.mode == 'SCULPT'
+        except: return False
+
+    def execute(self, context):
+        context.tool_settings.sculpt.brush.sculpt_tool = 'DRAW'
+        return {'FINISHED'}
+
+
+class OBJECT_OT_wm_set_smooth(bpy.types.Operator):
+    bl_idname = "object.wm_set_smooth"
+    bl_label = "Smooth"
+    bl_description = ("")
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        try:
+            return context.object.mode == 'SCULPT'
+        except: return False
+
+    def execute(self, context):
+        context.tool_settings.sculpt.brush.sculpt_tool = 'SMOOTH'
+        return {'FINISHED'}
+
+
+class OBJECT_OT_wm_set_grab(bpy.types.Operator):
+    bl_idname = "object.wm_set_grab"
+    bl_label = "Grab"
+    bl_description = ("")
+    bl_options = {'REGISTER', 'UNDO'}
+
+    @classmethod
+    def poll(cls, context):
+        try:
+            return context.object.mode == 'SCULPT'
+        except: return False
+
+    def execute(self, context):
+        context.tool_settings.sculpt.brush.sculpt_tool = 'GRAB'
+        return {'FINISHED'}
+
+
 ### Sculpt Tools ###
 from bl_ui.properties_paint_common import (
         UnifiedPaintPanel,
         brush_texture_settings,
-        brush_texpaint_common,
+        #brush_texpaint_common,
         brush_mask_texture_settings,
         )
 
@@ -127,15 +179,19 @@ class WASPMED_PT_sculpt(View3DPaintPanel, bpy.types.Panel):
 
         if context.mode == 'SCULPT':
             settings = self.paint_settings(context)
-            col.template_ID_preview(settings, "brush", rows=3, cols=8)
+            #col.template_ID_preview(settings, "brush", rows=3, cols=8)
             brush = settings.brush
             col.separator()
-            self.prop_unified_size(col, context, brush, "size", slider=True, text="Radius")
-            self.prop_unified_strength(col, context, brush, "strength", text="Strength")
+            row = col.row(align=True)
+            row.scale_y = 2
+            row.operator("object.wm_set_draw", icon="OUTLINER_DATA_GP_LAYER")#, icon="BRUSH_SCULPT_DRAW")
+            row.operator("object.wm_set_smooth", icon="MOD_SMOOTH")#, icon="BRUSH_SMOOTH")
+            row.operator("object.wm_set_grab", icon="MOD_WARP")#"BRUSH_GRAB")
+            #row.prop(context.tool_settings.sculpt.brush, 'sculpt_tool', icon_only = True, expand=True)
+            col.prop(context.scene.tool_settings.unified_paint_settings, 'size')
+            col.prop(context.scene.tool_settings.unified_paint_settings, 'strength')
         else:
             col.operator("object.wm_set_sculpt", icon="SCULPTMODE_HLT")
-
-        #col.template_preview(bpy.data.brushes[0], show_buttons=False)
 
         col.separator()
         box = layout.box()
@@ -153,28 +209,11 @@ class WASPMED_PT_sculpt(View3DPaintPanel, bpy.types.Panel):
                             text="Check Differences On")
         if context.mode == 'OBJECT':
             col.separator()
-            col.operator("object.wm_add_measure_plane", text="Add Measure Plane", icon='MESH_PLANE')
-            col.operator("object.wm_measure_circumference", text="Measure Circumference", icon='DRIVER_DISTANCE')
+            col.operator("object.wm_add_measure_plane", text="Add Measure Plane", icon='MESH_CIRCLE')
+            col.operator("object.wm_measure_circumference", text="Measure Circumferences", icon='DRIVER_DISTANCE')
         col.separator()
         col.operator("screen.region_quadview", text="Toggle Quad View", icon='VIEW3D')
         col.separator()
         row = col.row(align=True)
         row.operator("ed.undo", icon='LOOP_BACK')
         row.operator("ed.redo", icon='LOOP_FORWARDS')
-
-'''
-def register():
-    bpy.utils.register_class(waspmed_sculpt_panel)
-    bpy.utils.register_class(set_sculpt)
-    #bpy.utils.register_class(object.back)
-
-
-def unregister():
-    bpy.utils.unregister_class(waspmed_sculpt_panel)
-    bpy.utils.unregister_class(set_sculpt)
-    #bpy.utils.unregister_class(back)
-
-
-if __name__ == "__main__":
-    register()
-'''

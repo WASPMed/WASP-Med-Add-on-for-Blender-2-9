@@ -238,7 +238,6 @@ class OBJECT_OT_wm_add_measure_plane(bpy.types.Operator):
     def execute(self, context):
         ob = get_patient(context.object)
         if get_patientID(ob) == None or ob == False: ob = context.object
-        print(ob.name)
         size = ob.dimensions.length
         bpy.ops.mesh.primitive_plane_add(size=size, location=(0, 0, 0))
         plane = context.object
@@ -263,50 +262,52 @@ class OBJECT_OT_wm_add_measure_plane(bpy.types.Operator):
 
 class OBJECT_OT_wm_measure_circumference(bpy.types.Operator):
     bl_idname = "object.wm_measure_circumference"
-    bl_label = "Measure Circumference"
+    bl_label = "Measure Circumferences"
     bl_description = ("Recompute the circumference of the selected section plane")
     bl_options = {'REGISTER', 'UNDO'}
 
     @classmethod
     def poll(cls, context):
-        try:
-            ob = context.object
-            if "Circumference" in ob.name:
-                return not ob.hide_viewport
-            else: return False
-        except: return False
+        for ob in bpy.data.objects:
+            if "Circumference" in ob.name and not ob.hide_viewport:
+                return True
+        return False
 
     def execute(self, context):
-        ob = context.object
-        bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
-        show_modifiers = []
-        for m in ob.modifiers:
-            show_modifiers.append(m.show_viewport)
-            if m.type != 'BOOLEAN': m.show_viewport = False
-        depsgraph = bpy.context.evaluated_depsgraph_get()
-        ob_eval = ob.evaluated_get(depsgraph)
-        me = ob_eval.to_mesh()
-        for m, show in zip(ob.modifiers, show_modifiers): m.show_viewport = show
-        length = 0
-        bm = bmesh.new()
-        bm.from_mesh(me)
-        for e in bm.edges: length += e.calc_length()
-        #length *= bpy.context.scene.unit_settings.scale_length
+        for ob in bpy.data.objects:
+            if "Circumference" in ob.name:
+                #ob = context.object
+                override = {'active_object': ob, 'selected_objects': ob}
+                bpy.ops.object.transform_apply(override, location=False, rotation=False, scale=True)
+                show_modifiers = []
+                for m in ob.modifiers:
+                    show_modifiers.append(m.show_viewport)
+                    if m.type != 'BOOLEAN': m.show_viewport = False
+                depsgraph = bpy.context.evaluated_depsgraph_get()
+                ob_eval = ob.evaluated_get(depsgraph)
+                me = ob_eval.to_mesh()
+                for m, show in zip(ob.modifiers, show_modifiers): m.show_viewport = show
+                length = 0
+                bm = bmesh.new()
+                bm.from_mesh(me)
+                for e in bm.edges: length += e.calc_length()
+                bm.free()
+                #length *= bpy.context.scene.unit_settings.scale_length
 
-        if bpy.context.scene.unit_settings.system == 'METRIC':
-            unit = bpy.context.scene.unit_settings.length_unit
-            unit_dict = {
-                'ADAPTIVE': 'm',
-                'KILOMETERS': 'km',
-                'METERS': 'm',
-                'CENTIMETERS': 'cm',
-                'MILLIMETERS': 'mm',
-                'MICROMETERS': 'μm'
-            }
-            unit_str = unit_dict[unit]
-        else: unit_str = ""
-        ob.name = ob.name.split(":")[0] + ": {:.2f} {}".format(length, unit_str)
-        ob.show_name = True
+                if bpy.context.scene.unit_settings.system == 'METRIC':
+                    unit = bpy.context.scene.unit_settings.length_unit
+                    unit_dict = {
+                        'ADAPTIVE': 'm',
+                        'KILOMETERS': 'km',
+                        'METERS': 'm',
+                        'CENTIMETERS': 'cm',
+                        'MILLIMETERS': 'mm',
+                        'MICROMETERS': 'μm'
+                    }
+                    unit_str = unit_dict[unit]
+                else: unit_str = ""
+                ob.name = "Circumference" + ": {:.2f} {}".format(length, unit_str)
+                ob.show_name = True
         return {'FINISHED'}
 
 class MESH_OT_wm_cap_holes(bpy.types.Operator):
@@ -750,7 +751,7 @@ class SCENE_OT_wm_setup(bpy.types.Operator):
 from bl_ui.properties_paint_common import (
         UnifiedPaintPanel,
         brush_texture_settings,
-        brush_texpaint_common,
+        #brush_texpaint_common,
         brush_mask_texture_settings,
         )
 
@@ -881,7 +882,7 @@ class WASPMED_PT_scan(View3DPaintPanel, bpy.types.Panel):
         if context.mode == 'OBJECT':
             col.separator()
             col.operator("object.wm_add_measure_plane", text="Add Measure Plane", icon='MESH_CIRCLE')
-            col.operator("object.wm_measure_circumference", text="Measure Circumference", icon='DRIVER_DISTANCE')
+            col.operator("object.wm_measure_circumference", text="Measure Circumferences", icon='DRIVER_DISTANCE')
         col.separator()
         col.operator("screen.region_quadview", text="Toggle Quad View", icon='VIEW3D')
         col.separator()
