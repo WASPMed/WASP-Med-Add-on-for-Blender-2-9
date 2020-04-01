@@ -803,7 +803,7 @@ class WASPMED_PT_progress(View3DPaintPanel, bpy.types.Panel):
                 row = col.row(align=True)
                 row.operator("object.wm_back", icon='BACK')#, text="")
                 if context.object.waspmed_prop.status == 7:
-                    row.operator("export_mesh.stl", icon='EXPORT')#, text="")
+                    row.operator("export_mesh.stl", icon='EXPORT').use_selection = True
                 #elif context.object.waspmed_prop.status == 6:
                 #    row.operator("object.convert", icon='EXPORT')#, text="")
                 else:

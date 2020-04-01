@@ -80,16 +80,6 @@ class WASPMED_PT_print(bpy.types.Panel):
         row.prop(context.object.waspmed_prop, "bool_trim_bottom", icon='MOD_DECIM', text="")
         col.separator()
 
-        '''
-        col.separator()
-        col.label(text="Export:", icon='EXPORT')
-        row = col.row(align=True)
-        row.operator("export_mesh.stl", text="STL")
-        row.operator("export_scene.obj", text="OBJ")
-        col.separator()
-        #col.separator()
-        '''
-
         box = layout.box()
         col = box.column(align=True)
         #col.label(text="Utils:")
