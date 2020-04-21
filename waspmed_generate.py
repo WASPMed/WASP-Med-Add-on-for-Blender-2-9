@@ -364,13 +364,30 @@ class OBJECT_OT_wm_set_weight_paint(bpy.types.Operator):
         bpy.context.view_layer.objects.active = ob
         ob.select_set(True)
         bpy.ops.object.mode_set(mode='WEIGHT_PAINT')
+        context.tool_settings.weight_paint.brush = bpy.data.brushes['Draw']
         return {'FINISHED'}
+
+class OBJECT_OT_wm_weight_add_subtract(bpy.types.Operator):
+    bl_idname = "object.wm_weight_add_subtract"
+    bl_label = "Change Brush"
+    bl_options = {'REGISTER', 'UNDO'}
+    bl_description = ('Change brush mode')
+
+    def execute(self, context):
+        context.tool_settings.weight_paint.brush = bpy.data.brushes['Draw']
+        val = context.scene.tool_settings.unified_paint_settings.weight
+        if val < 0.5:
+            context.scene.tool_settings.unified_paint_settings.weight = 1
+        else:
+            context.scene.tool_settings.unified_paint_settings.weight = 0
+        return {'FINISHED'}
+
 
 ### Sculpt Tools ###
 from bl_ui.properties_paint_common import (
         UnifiedPaintPanel,
         brush_texture_settings,
-        brush_texpaint_common,
+        #brush_texpaint_common,
         brush_mask_texture_settings,
         )
 
@@ -415,11 +432,18 @@ class WASPMED_PT_generate(View3DPaintPanel, bpy.types.Panel):
 
         if context.mode == 'PAINT_WEIGHT':
             settings = self.paint_settings(context)
-            col.template_ID_preview(settings, "brush", rows=3, cols=8)
+            #col.template_ID_preview(settings, "brush", rows=3, cols=8)
+            weight = context.scene.tool_settings.unified_paint_settings.weight
+            if weight < 0.5:
+                col.operator("object.wm_weight_add_subtract", icon="SELECT_EXTEND", text='Add')
+            else:
+                col.operator("object.wm_weight_add_subtract", icon="SELECT_SUBTRACT", text='Subtract')
             brush = settings.brush
             col.separator()
-            self.prop_unified_size(col, context, brush, "size", slider=True, text="Radius")
-            self.prop_unified_strength(col, context, brush, "strength", text="Strength")
+            col.prop(context.scene.tool_settings.unified_paint_settings, 'size')
+            col.prop(context.scene.tool_settings.unified_paint_settings, 'strength')
+            #self.prop_unified_size(col, context, brush, "size", slider=True, text="Radius")
+            #self.prop_unified_strength(col, context, brush, "strength", text="Strength")
         else:
             col.operator("object.wm_set_weight_paint", icon="BRUSH_DATA")
 
@@ -433,8 +457,8 @@ class WASPMED_PT_generate(View3DPaintPanel, bpy.types.Panel):
         #col.operator("view3d.ruler", text="Ruler", icon="ARROW_LEFTRIGHT")
         if context.mode == 'OBJECT':
             col.separator()
-            col.operator("object.wm_add_measure_plane", text="Add Measure Plane", icon='MESH_PLANE')
-            col.operator("object.wm_measure_circumference", text="Measure Circumference", icon='DRIVER_DISTANCE')
+            col.operator("object.wm_add_measure_plane", text="Add Measure Plane", icon='MESH_CIRCLE')
+            col.operator("object.wm_measure_circumference", text="Measure Circumferences", icon='DRIVER_DISTANCE')
         col.separator()
         col.operator("screen.region_quadview", text="Toggle Quad View", icon='VIEW3D')
         col.separator()

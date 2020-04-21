@@ -22,6 +22,7 @@ from mathutils import Vector
 import numpy as np
 from math import sqrt, radians, pi
 import random, re
+from .utils import *
 
 
 class OBJECT_OT_wm_crop_geometry(bpy.types.Operator):
@@ -43,7 +44,7 @@ class OBJECT_OT_wm_crop_geometry(bpy.types.Operator):
             id = o.waspmed_prop.patientID
             s = o.waspmed_prop.status
             if patientID == id and s == status-1:
-                ob.data = o.to_mesh().copy()
+                ob.data = simple_to_mesh(o) #o.to_mesh().copy()
         bpy.ops.object.mode_set(mode='EDIT')
 
         side = False
@@ -122,7 +123,8 @@ class OBJECT_OT_wm_define_crop_planes(bpy.types.Operator):
             id = o.waspmed_prop.patientID
             s = o.waspmed_prop.status
             if patientID == id and s == status-1:
-                ob.data = o.to_mesh().copy()
+                ob.data = simple_to_mesh(o)
+                print(o)
 
         bb0 = Vector(ob.bound_box[0])
         bb1 = Vector(ob.bound_box[6])
@@ -442,8 +444,8 @@ class WASPMED_PT_crop(bpy.types.Panel):
         #col.separator()
         if context.mode == 'OBJECT':
             col.separator()
-            col.operator("object.wm_add_measure_plane", text="Add Measure Plane", icon='MESH_PLANE')
-            col.operator("object.wm_measure_circumference", text="Measure Circumference", icon='DRIVER_DISTANCE')
+            col.operator("object.wm_add_measure_plane", text="Add Measure Plane", icon='MESH_CIRCLE')
+            col.operator("object.wm_measure_circumference", text="Measure Circumferences", icon='DRIVER_DISTANCE')
         col.separator()
         col.operator("screen.region_quadview", text="Toggle Quad View", icon='VIEW3D')
         col.separator()
