@@ -241,14 +241,14 @@ class OBJECT_OT_wm_add_measure_plane(bpy.types.Operator):
         size = ob.dimensions.length
         bpy.ops.mesh.primitive_plane_add(size=size, location=(0, 0, 0))
         plane = context.object
-        bpy.ops.object.modifier_add(type='BOOLEAN')
-        plane.modifiers[-1].object = ob
-        plane.modifiers[-1].operation = 'INTERSECT'
-        bpy.ops.object.modifier_add(type='WIREFRAME')
-        plane.modifiers[-1].use_boundary = True
-        plane.modifiers[-1].thickness = self.thickness
-        plane.modifiers[-1].use_even_offset = False
-
+        mod = plane.modifiers.new(name='Boolean', type='BOOLEAN')
+        mod.solver = 'FAST'
+        mod.object = ob
+        mod.operation = 'INTERSECT'
+        mod = plane.modifiers.new(name='Wireframe', type='WIREFRAME')
+        mod.use_boundary = True
+        mod.thickness = self.thickness
+        mod.use_even_offset = False
         try:
             mat = bpy.data.materials["Circumference"]
         except:
@@ -614,10 +614,12 @@ class OBJECT_OT_wm_rebuild_mesh(bpy.types.Operator):
         bpy.ops.object.wm_back()
         bpy.ops.object.wm_next()
 
-        bpy.ops.object.modifier_add(type='REMESH')
-        bpy.context.object.modifiers["Remesh"].mode = 'SMOOTH'
-        bpy.context.object.modifiers["Remesh"].octree_depth = self.detail
-        bpy.ops.object.modifier_apply(apply_as='DATA', modifier="Remesh")
+        bpy.ops.object.editmode_toggle()
+        mod = context.object.modifiers.new(name='Remesh', type='REMESH')
+        mod.mode = 'SMOOTH'
+        bpy.ops.object.editmode_toggle()
+        mod.octree_depth = self.detail
+        bpy.ops.object.modifier_apply(modifier="Remesh")
         return {'FINISHED'}
 
 
