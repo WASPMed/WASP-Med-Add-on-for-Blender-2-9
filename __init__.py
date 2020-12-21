@@ -17,10 +17,10 @@
 # ##### END GPL LICENSE BLOCK #####
 
 # -------------------------------- WASPmed ------------------------------------#
-#-------------------------------- version 0.1 ---------------------------------#
+#-------------------------------- version 0.8 ---------------------------------#
 #                                                                              #
 #                                    WASP                                      #
-#                                   (2018)                                     #
+#                                   (2020)                                     #
 #                                                                              #
 # http://http://www.wasproject.it/                                             #
 #                                                                              #
@@ -51,8 +51,8 @@ import bpy, bmesh
 bl_info = {
 	"name": "Waspmed",
 	"author": "WASP",
-	"version": (0, 0, 7),
-	"blender": (2, 82, 0),
+	"version": (0, 0, 8),
+	"blender": (2, 91, 0),
 	"location": "",
 	"description": "Tools for medical devices",
 	"warning": "",
